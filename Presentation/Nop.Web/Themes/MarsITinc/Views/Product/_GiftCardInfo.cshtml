@@ -1,0 +1,42 @@
+﻿@model ProductDetailsModel.GiftCardModel
+@if (Model.IsGiftCard)
+{
+    <div class="giftcard">
+        <div class="row">
+            <label asp-for="RecipientName" asp-postfix=":" class="col-12 col-md-4 col-lg-3 col-form-label"></label>
+            <div class="col-12 col-md-8 col-lg-9 mb-3">
+                <input asp-for="RecipientName" class="recipient-name form-control" />
+            </div>
+        </div>
+        @if (Model.GiftCardType == Nop.Core.Domain.Catalog.GiftCardType.Virtual)
+        {
+            <div class="row">
+                <label asp-for="RecipientEmail" asp-postfix=":" class="col-12 col-md-4 col-lg-3 col-form-label"></label>
+                <div class="col-12 col-md-8 col-lg-9 mb-3">
+                    <input asp-for="RecipientEmail" class="recipient-email form-control" />
+                </div>
+            </div>
+        }
+        <div class="row">
+            <label asp-for="SenderName" asp-postfix=":" class="col-12 col-md-4 col-lg-3 col-form-label"></label>
+            <div class="col-12 col-md-8 col-lg-9 mb-3">
+                <input asp-for="SenderName" class="sender-name form-control" />
+            </div>
+        </div>
+        @if (Model.GiftCardType == Nop.Core.Domain.Catalog.GiftCardType.Virtual)
+        {
+            <div class="row">
+                <label asp-for="SenderEmail" asp-postfix=":" class="col-12 col-md-4 col-lg-3 col-form-label"></label>
+                <div class="col-12 col-md-8 col-lg-9 mb-3">
+                    <input asp-for="SenderEmail" class="sender-email form-control" />
+                </div>
+            </div>
+        }
+        <div class="row">
+            <label asp-for="Message" asp-postfix=":" class="col-12 col-md-4 col-lg-3 col-form-label"></label>
+            <div class="col-12 col-md-8 col-lg-9 mb-3">
+                <textarea asp-for="Message" class="message form-control"></textarea>
+            </div>
+        </div>
+    </div>
+}

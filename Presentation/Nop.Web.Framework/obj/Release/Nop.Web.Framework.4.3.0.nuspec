@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Nop.Web.Framework</id>
+    <version>4.3.0</version>
+    <authors>Nop Solutions, Ltd</authors>
+    <licenseUrl>https://www.nopcommerce.com/license</licenseUrl>
+    <projectUrl>https://www.nopcommerce.com/</projectUrl>
+    <description>Nop.Web.Framework is a class library project containing some common presentation things for Nop.Web project</description>
+    <copyright>Copyright © Nop Solutions, Ltd</copyright>
+    <repository type="Git" url="https://github.com/nopSolutions/nopCommerce" />
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1">
+        <dependency id="Nop.Core" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="Nop.Data" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="Nop.Services" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="BundlerMinifier.Core" version="3.2.447" exclude="Build,Analyzers" />
+        <dependency id="FluentValidation.AspNetCore" version="8.6.2" exclude="Build,Analyzers" />
+        <dependency id="WebMarkupMin.AspNetCore3" version="2.8.2" exclude="Build,Analyzers" />
+        <dependency id="WebMarkupMin.NUglify" version="2.8.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\websites\nopDemp\Presentation\Nop.Web.Framework\bin\Release\netcoreapp3.1\Nop.Web.Framework.dll" target="lib\netcoreapp3.1\Nop.Web.Framework.dll" />
+  </files>
+</package>

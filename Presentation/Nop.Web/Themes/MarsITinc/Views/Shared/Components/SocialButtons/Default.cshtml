@@ -1,0 +1,19 @@
+﻿@model SocialModel
+    <ul class="networks">
+        @if (!string.IsNullOrEmpty(Model.FacebookLink))
+        {
+		<li class="facebook mx-4 d-inline-block"><a href="@Model.FacebookLink" target="_blank" class="fs-2"><i class="fa fa-facebook-square" aria-hidden="true"></i> </a></li>
+        }
+        @if (!string.IsNullOrEmpty(Model.TwitterLink))
+        {
+		<li class="twitter mx-4 d-inline-block"><a href="@Model.TwitterLink" target="_blank" class="fs-2"><i class="fa fa-twitter-square" aria-hidden="true"></i> </a></li>
+        }
+        @if (Model.NewsEnabled)
+        {
+		<li class="rss  mx-4 d-inline-block"><a class="fs-2" href="@Url.RouteUrl("NewsRSS", new {languageId = Model.WorkingLanguageId})"><i class="fa fa-rss-square" aria-hidden="true"></i> </a></li>
+        }
+        @if (!string.IsNullOrEmpty(Model.YoutubeLink))
+        {
+		<li class="youtube mx-4 d-inline-block"><a class="fs-2" href="@Model.YoutubeLink" target="_blank"><i class="fa fa-youtube-square" aria-hidden="true"></i></a> </li>
+        }
+    </ul>

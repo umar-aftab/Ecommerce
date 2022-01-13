@@ -1,0 +1,73 @@
+﻿@model CatalogPagingFilteringModel.PriceRangeFilterModel
+@{
+    var selectedItem = Model.Items.FirstOrDefault(x => x.Selected);
+}
+
+@functions {
+
+    public string FormatPriceRangeText(CatalogPagingFilteringModel.PriceRangeFilterItem filterItem)
+    {
+        var rangeText = "";
+        if (string.IsNullOrWhiteSpace(filterItem.From))
+        {
+            rangeText = string.Format(T("Filtering.PriceRangeFilter.Under").Text, $"{filterItem.To}");
+        }
+        else if (string.IsNullOrWhiteSpace(filterItem.To))
+        {
+            rangeText = string.Format(T("Filtering.PriceRangeFilter.Over").Text, $"{filterItem.From}");
+        }
+        else
+        {
+            rangeText = $"{filterItem.From} - {filterItem.To}";
+        }
+        return rangeText;
+    }
+}
+@if (Model.Enabled)
+{
+    @if (selectedItem == null)
+    {
+        <div class="dropdown me-3 d-inline-block mb-4">
+            <button class="btn border border-dark rounded-0 dropdown-toggle btn-sm" type="button" id='filterPriceRange' data-bs-toggle="dropdown" aria-expanded="false">
+                Price Range
+                &nbsp; &nbsp; &nbsp; &nbsp;
+            </button>
+
+            <ul class="dropdown-menu filter-dropdown-menu p-2" aria-labelledby="filterPriceRange">
+                @foreach (var item in Model.Items)
+                {
+                    <li class="dropdown-item my-2">
+                        <a href="@item.FilterUrl" class="filter-check-label">
+                            <div class="form-check">
+                                <input class="form-check-input rounded-0 me-3 filter-check-input" type="checkbox" value="" id='@Html.Raw(item.GetHashCode())' onchange='window.location.href = "@item.FilterUrl"'/>
+                                <label class="form-check-label filter-check-label" for='@Html.Raw(item.GetHashCode())'>
+                                    @Html.Raw(FormatPriceRangeText(item))
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <a href="@Model.RemoveFilterUrl" class="text-uppercase text-danger btn-filter-remove fs-6">
+            <i class="fa fa-trash-o" aria-hidden="true"></i>
+            @T("Filtering.PriceRangeFilter.Remove")
+        </a>
+
+        <div class="filtered-items border-bottom mb-4">
+            <ul class="ps-0 mb-4">
+                <li class="fs-5 fw-bold text-capitalize mb-4">
+                    @T("Filtering.SpecificationFilter.CurrentlyFilteredBy")
+                </li>
+                <li class="item">
+                    <span class="me-2 fw-bold">Price Range : </span>  
+                    <span class="selected-filter-item">@Html.Raw(FormatPriceRangeText(selectedItem))</span>
+                </li>
+            </ul>
+        </div>
+    }
+
+}

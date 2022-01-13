@@ -1,0 +1,328 @@
+﻿@model TopMenuModel
+
+@functions {
+    async Task TopCategoryLine(TopMenuModel.CategoryLineModel lineModel)
+    {
+        <li class='@(lineModel.Level == 0 ? "dropdown megamenu-fw" : "")'>
+            @if (lineModel.Level == 0 && lineModel.Category.SubCategories.Count() > 0)
+            {
+                <a class="nav-link text-uppercase dropdown-toggle font-bold" href='@Url.RouteUrl("Category", new { SeName = lineModel.Category.SeName })' data-bs-toggle="dropdown" aria-expanded="false">
+                    @lineModel.Category.Name
+                    @if (lineModel.Category.NumberOfProducts.HasValue)
+                    {
+                        <text> </text>
+                        @T("Categories.TotalProducts", lineModel.Category.NumberOfProducts.Value)
+                    }
+                </a>
+            }
+            else
+            {
+                <a class="nav-link text-uppercase font-bold" href='@Url.RouteUrl("Category", new { SeName = lineModel.Category.SeName })'>
+                    @lineModel.Category.Name
+                    @if (lineModel.Category.NumberOfProducts.HasValue)
+                    {
+                        <text> </text>
+                        @T("Categories.TotalProducts", lineModel.Category.NumberOfProducts.Value)
+                    }
+                </a>
+            }
+
+            @if (lineModel.Category.SubCategories.Count() > 0)
+            {
+                CategoryMenu(lineModel);
+            }
+        </li>
+    }
+
+    async Task CategoryMenu(TopMenuModel.CategoryLineModel lineModel)
+    {
+        //subcategories
+        var subCategories = lineModel.ResponsiveMobileMenu ?
+            //responsive (all categories)
+            lineModel.Category.SubCategories :
+            //standard design (only categories with "IncludeInTopMenu")
+            lineModel.Category.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
+        if (subCategories.Count > 0)
+        {
+            <div class="dropdown-menu megamenu-content rounded-0" role="menu" style="display: none;">
+                <div class="row">
+                    @foreach (var subCategory in subCategories)
+                    {
+                        var subLCategories = lineModel.ResponsiveMobileMenu ?
+                        //responsive (all categories)
+                        subCategory.SubCategories :
+                        //standard design (only categories with "IncludeInTopMenu")
+                        subCategory.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
+
+                        <div class='@(subCategory.SubCategories.Count > 4 ? "col-md-3 mb-2 order-first" : "col-md-3 mb-2")'>
+                            <a href='@Url.RouteUrl("Category", new { SeName = subCategory.SeName })' class='fw-bold text-uppercase'>
+                                @subCategory.Name
+                                @if (subCategory.NumberOfProducts.HasValue)
+                                {
+                                    <text> </text>
+                                    @T("Categories.TotalProducts", subCategory.NumberOfProducts.Value)
+                                }
+                            </a>
+
+                            @if (subLCategories.Count > 0)
+                            {
+                                <ul class="megaMenuUl">
+                                    @foreach (var subLCategory in subLCategories)
+                                    {
+                                        <li>
+                                            <a class='megaMenuLi' href='@Url.RouteUrl("Category", new { SeName = subLCategory.SeName })'>
+                                                @subLCategory.Name
+                                                @if (subLCategory.NumberOfProducts.HasValue)
+                                                {
+                                                    <text> </text>
+                                                    @T("Categories.TotalProducts", subLCategory.NumberOfProducts.Value)
+                                                }
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+}
+
+
+@functions {
+    async Task CategoryLine(TopMenuModel.CategoryLineModel lineModel, bool isRoot, bool isMobile)
+    {
+        //subcategories
+        var subCategories = lineModel.ResponsiveMobileMenu ?
+            //responsive (all categories)
+            lineModel.Category.SubCategories :
+            //standard design (only categories with "IncludeInTopMenu")
+            lineModel.Category.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
+        <li class="nav-item">
+            <a class="@(isRoot ? "nav-link text-uppercase" : "nav-link")" href="@Url.RouteUrl("Category", new { SeName = lineModel.Category.SeName })">
+                @lineModel.Category.Name
+                @if (lineModel.Category.NumberOfProducts.HasValue)
+                {
+                    <text> </text>
+
+                    @T("Categories.TotalProducts", lineModel.Category.NumberOfProducts.Value)
+                }
+                @if (subCategories.Count > 0 && !isMobile)
+                {
+                    <i class="@(isRoot ? "fa fa-angle-down" : "fa fa-angle-right fs-5 pull-right")" aria-hidden="true"></i>
+                }
+            </a>
+            @{
+                var levelClass = "";
+                if (lineModel.Level == 0)
+                {
+                    levelClass = "first-level";
+                }
+                if (subCategories.Count > 0)
+                {
+                    <div class="sublist-toggle"></div>
+                    <ul class="sublist dropdown-menu @levelClass">
+                        @foreach (var subCategory in subCategories)
+                        {
+                            var categoryLineModel = new TopMenuModel.CategoryLineModel
+                    {
+                        Category = subCategory,
+                        Level = lineModel.Level + 1,
+                        ResponsiveMobileMenu = lineModel.ResponsiveMobileMenu
+                    };
+                            await CategoryLine(categoryLineModel, false, isMobile);
+                        }
+                    </ul>
+                }
+            }
+        </li>
+    }
+}
+
+
+<div class="collapse navbar-collapse">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
+        @{
+            var rootCategories = Model.Categories.Where(x => x.IncludeInTopMenu).ToList();
+
+            if (Model.DisplayHomepageMenuItem)
+            {
+                <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("Homepage")">@T("Homepage")</a></li>
+            }
+            if (!Model.UseAjaxMenu)
+            {
+                @foreach (var category in rootCategories)
+                {
+                    var categoryLineModel = new TopMenuModel.CategoryLineModel
+                    {
+                        Category = category
+                    };
+                    await TopCategoryLine(categoryLineModel);
+                }
+
+            }
+        }
+        @foreach (var topic in Model.Topics)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
+        }
+        @if (Model.NewProductsEnabled && Model.DisplayNewProductsMenuItem)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a></li>
+        }
+        @if (Model.DisplayProductSearchMenuItem)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("ProductSearch")">@T("Search")</a></li>
+        }
+        @if (Model.DisplayCustomerInfoMenuItem)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
+        }
+        @if (Model.BlogEnabled && Model.DisplayBlogMenuItem)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+        }
+        @if (Model.ForumEnabled && Model.DisplayForumsMenuItem)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+        }
+        @if (Model.DisplayContactUsMenuItem)
+        {
+            <li class="dropdown megamenu-fw"><a class="nav-link text-uppercase font-bold" href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuAfter })
+    </ul>
+    <script asp-location="Footer">
+        $(document).ready(function(){
+
+            $(".dropdown.megamenu-fw").hover(
+               function(){ $(this).addClass('active')},
+               function(){ $(this).removeClass('active')}
+            );
+
+            $(".dropdown.megamenu-fw").hover(
+                function() { $('.dropdown-menu', this).show();},
+                function() { $('.dropdown-menu', this).hide();}
+            );
+
+            $(".dropdown.megamenu-fw .nav-link").click(function () {
+                window.location = $(this).attr('href');
+            });
+
+            //$(".dropdown.megamenu-fw").click(function(){
+            //    $(this).toggleClass('active');
+            //});
+
+            //$(".mega-menu").mouseenter(function() {
+            //    $('.menu-dropdown', $(this)).stop().show();
+            //});
+
+            //$(".mega-menu, .menu-dropdown").mouseleave(function() {
+            //    if(!$('.menu-dropdown', $(this)).is(':hover')){
+            //        $('.menu-dropdown', $(this)).hide();
+            //    };
+            //});
+        });
+    </script>
+</div>
+
+@{
+    var rootCategoriesResponsive = Model.Categories.ToList();
+    var responsiveMenuTitle = Model.HasOnlyCategories ? T("Categories") : T("Menu");
+    <div class="header-menu">
+        <button class="menu-toggle navbar-toggler mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="d-inline-flex d-lg-none pull-right mt-1 col-9">
+            @await Component.InvokeAsync("SearchBox")
+        </div>
+
+        <ul class="top-menu mobile">
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
+            @if (Model.DisplayHomepageMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("Homepage")" class="text-uppercase">@T("Homepage")</a></li>
+            }
+            @if (!Model.UseAjaxMenu)
+            {
+                @foreach (var category in rootCategoriesResponsive)
+                {
+                    var categoryLineModel = new TopMenuModel.CategoryLineModel
+                    {
+                        Category = category,
+                        ResponsiveMobileMenu = true
+                    };
+                    await CategoryLine(categoryLineModel, true, true);
+                }
+
+            }
+            @foreach (var topic in Model.Topics)
+            {
+                <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })" class="text-uppercase">@topic.Name</a></li>
+            }
+            @if (Model.NewProductsEnabled && Model.DisplayNewProductsMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("NewProducts")" class="text-uppercase">@T("Products.NewProducts")</a></li>
+            }
+            @if (Model.DisplayProductSearchMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("ProductSearch")" class="text-uppercase">@T("Search")</a></li>
+            }
+            @if (Model.DisplayCustomerInfoMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("CustomerInfo")" class="text-uppercase">@T("Account.MyAccount")</a></li>
+            }
+            @if (Model.BlogEnabled && Model.DisplayBlogMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("Blog")" class="text-uppercase">@T("Blog")</a></li>
+            }
+            @if (Model.ForumEnabled && Model.DisplayForumsMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("Boards")" class="text-uppercase">@T("Forum.Forums")</a></li>
+            }
+            @if (Model.DisplayContactUsMenuItem)
+            {
+                <li><a href="@Url.RouteUrl("ContactUs")" class="text-uppercase">@T("ContactUs")</a></li>
+            }
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuAfter })
+        </ul>
+    </div>
+
+
+    @if (Model.UseAjaxMenu)
+    {
+        <script asp-location="Footer">
+            $(document).ready(function () {
+                $('.menu-toggle').on('click', function () {
+                    $(this).siblings('.top-menu.mobile').slideToggle('slow');
+                });
+                var localized_data = {
+                    AjaxFailure: "@T("MainMenu.AjaxFailure")"
+                };
+                mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
+            });
+        </script>
+
+        Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.menu.js");
+
+    }
+    else
+    {
+        <script asp-location="Footer">
+            $(document).ready(function () {
+                $('.menu-toggle').on('click', function () {
+                    $(this).siblings('.top-menu.mobile').slideToggle('slow');
+                });
+                $('.top-menu.mobile .sublist-toggle').on('click', function () {
+                    $(this).siblings('.sublist').slideToggle('slow');
+                });
+            });
+        </script>
+
+    }
+
+}

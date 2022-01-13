@@ -1,0 +1,88 @@
+﻿@model CatalogPagingFilteringModel.SpecificationFilterModel
+@{
+    var notFilteredItemsGroups = Model.NotFilteredItems.GroupBy(x => x.SpecificationAttributeName);
+    var alreadyFilteredItemsGroups = Model.AlreadyFilteredItems.GroupBy(x => x.SpecificationAttributeName);
+}
+@if (Model.Enabled)
+{
+    @if (Model.AlreadyFilteredItems.Count > 0)
+    {
+        <a href="@Model.RemoveFilterUrl" class="text-uppercase text-danger btn-filter-remove fs-6">
+            <i class="fa fa-trash-o" aria-hidden="true"></i> @T("Filtering.SpecificationFilter.Remove")
+        </a>
+    }
+
+    @if (Model.NotFilteredItems.Count > 0)
+    {
+
+        @foreach (var group in notFilteredItemsGroups)
+        {
+            var groupList = group.ToList();
+
+            <div class="dropdown me-3 d-inline-block mb-4">
+                <button class="btn border border-dark rounded-0 dropdown-toggle btn-sm" type="button" id='@groupList[0].SpecificationAttributeName' data-bs-toggle="dropdown" aria-expanded="false">
+                    @groupList[0].SpecificationAttributeName
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                </button>
+                <ul class="dropdown-menu filter-dropdown-menu p-2" aria-labelledby='@groupList[0].SpecificationAttributeName'>
+                    @foreach (var spec in groupList)
+                    {
+                        <li class="dropdown-item my-2">
+
+                            @if (string.IsNullOrEmpty(spec.SpecificationAttributeOptionColorRgb))
+                            {
+                                <a href="@spec.FilterUrl" class="d-block">
+                                    <div class="form-check">
+                                        <input class="form-check-input rounded-0 me-3 filter-check-input" type="checkbox" value="" id="spec_@spec.GetHashCode()" onchange='window.location.href = "@spec.FilterUrl"'>
+                                        <label class="form-check-label filter-check-label" for="spec_@spec.GetHashCode()">
+                                            @spec.SpecificationAttributeOptionName
+                                        </label>
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="attribute-squares color-squares">
+                                    <a href="@spec.FilterUrl" class="d-block">
+                                        <span class="attribute-square-container" title="@spec.SpecificationAttributeOptionName">
+                                            <span class="attribute-square" style="background-color: @(spec.SpecificationAttributeOptionColorRgb);">&nbsp;</span>
+                                        </span>
+                                        <span class="d-inline-block filter-check-label mt-1 ms-2 align-top">@spec.SpecificationAttributeOptionName</span>
+                                    </a>
+                                </div>
+                            }
+
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+
+    }
+
+    @if (Model.AlreadyFilteredItems.Count > 0)
+    {
+        <div class="filtered-items border-bottom mb-4">
+            <ul class="ps-0 mb-3">
+                <li class="fs-5 fw-bold text-capitalize mb-4">
+                    @T("Filtering.SpecificationFilter.CurrentlyFilteredBy")
+                </li>
+                <li>
+                    @foreach (var group in alreadyFilteredItemsGroups)
+                    {
+                        <div class="mb-4">
+                            <span class="fw-bold me-2">@group.First().SpecificationAttributeName :</span>
+
+                            @foreach (var item in group.ToList())
+                            {
+                            <span class="selected-filter-item">
+                                @item.SpecificationAttributeOptionName
+                            </span>
+                            }
+                        </div>
+                    }
+                </li>
+            </ul>
+        </div>
+    }
+}

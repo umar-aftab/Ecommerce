@@ -1,0 +1,33 @@
+﻿@model ProductReviewOverviewModel
+@{
+    var ratingPercent = 0;
+    if (Model.TotalReviews != 0)
+    {
+        ratingPercent = ((Model.RatingSum * 100) / Model.TotalReviews) / 5;
+    }
+}
+@if (Model.AllowCustomerReviews)
+{
+    <div class="product-reviews-overview mb-2">
+        <div class="product-review-box d-inline-block me-3">
+            <div class="rating">
+                <div style="width: @(ratingPercent)%">
+                </div>
+            </div>
+        </div>
+
+        @if (Model.TotalReviews > 0)
+        {
+            <div class="product-review-links d-inline-block">
+                <a href="@Url.RouteUrl("ProductReviews", new { productId = Model.ProductId })" class="fs-6">@Model.TotalReviews
+                    @T("Reviews.Overview.Reviews")</a> <span class="separator mx-2">|</span> <a class="fs-6" href="@Url.RouteUrl("ProductReviews", new { productId = Model.ProductId })">@T("Reviews.Overview.AddNew")</a>
+            </div>            
+        }
+        else
+        {
+            <div class="product-no-reviews d-inline-block">
+                <a class="fs-6" href="@Url.RouteUrl("ProductReviews", new { productId = Model.ProductId })">@T("Reviews.Overview.First")</a>
+            </div>
+        }
+    </div>
+}
