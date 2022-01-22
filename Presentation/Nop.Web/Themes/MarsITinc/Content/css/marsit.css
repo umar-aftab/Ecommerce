@@ -6483,3 +6483,8 @@ a:hover {
     color: #007185;
     margin-right: 12px;
 }
+
+ul.category-menu a.active {
+    color: #ef4036;
+    font-weight: bold;
+}

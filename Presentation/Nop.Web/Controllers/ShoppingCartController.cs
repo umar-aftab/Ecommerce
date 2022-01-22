@@ -398,14 +398,24 @@ namespace Nop.Web.Controllers
                             ? RenderViewComponentToString("FlyoutShoppingCart")
                             : string.Empty;
 
+
                         return Json(new
                         {
                             success = true,
-                            message = string.Format(_localizationService.GetResource("Products.ProductHasBeenAddedToTheCart.Link"),
-                                Url.RouteUrl("ShoppingCart")),
+                            redirect = Url.RouteUrl("Homepage"),
+//                            message = string.Format(_localizationService.GetResource("Products.ProductHasBeenAddedToTheCart.Link"),
+//Url.RouteUrl("Homepage")),
                             updatetopcartsectionhtml,
                             updateflyoutcartsectionhtml
                         });
+                        //return Json(new
+                        //{
+                        //    success = true,
+                        //    message = string.Format(_localizationService.GetResource("Products.ProductHasBeenAddedToTheCart.Link"),
+                        //        Url.RouteUrl("ShoppingCart")),
+                        //    updatetopcartsectionhtml,
+                        //    updateflyoutcartsectionhtml
+                        //});
                     }
             }
         }
